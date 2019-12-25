@@ -1,0 +1,113 @@
+setwd("G:/BABI - Online/Session 24 TSF Week 3/Mentoring Session")
+getwd()
+sales_m = read.csv('Yahoo Finance.csv')
+
+#annual sales data
+#make ts object
+msales_ts = ts(sales_m[,2], start = c(1990), frequency = 1)
+plot(msales_ts)
+#msales_ts
+
+#create train and test data
+msales.train <- window(msales_ts, end = c(2011))
+msales.test<- window(msales_ts, start = c(2012))
+
+#msales.train
+#msales.test
+
+
+library(TTR)
+#simple moving average
+?SMA
+sales_sma3 = SMA(msales_ts, n=3)
+ts.plot(sales_sma3, msales_ts, gpars = list(col = c("red", "black")))
+
+
+#simple exponential smoothing #no trend no seasonality
+#constant forecast
+ses.msales = ses(msales.train, alpha = 0.2, h=2)
+autoplot(ses.msales)
+
+accuracy(ses.msales, msales.test)
+
+#lag 1 difference #ses on diff sales data
+msales.dif.train <- diff(msales.train)
+msales.dif.test <- diff(msales.test)
+
+autoplot(msales.dif.train)
+ses.msales.dif <- ses(msales.dif.train, h = 2)
+ses.msales.dif$model
+
+accuracy(ses.msales.dif, msales.dif.test)
+autoplot(ses.msales.dif)
+
+#holt's model with level and trend but no seasonality
+#double exponential smoothing
+holt.sales <- holt(msales.train, h = 2)
+autoplot(holt.sales)
+autoplot(forecast::forecast(holt.sales))
+
+holt.sales$model
+
+accuracy(holt.sales, msales.test)
+
+?ets
+
+
+#arima
+#for kpss
+#null data is stationary
+#alternate data is non-stationary
+
+kpss.test(msales.train)
+
+#for adf
+#null data is non-stationary
+#alternate data is stationary
+adf.test(msales.train)
+?adf.test
+require("sos")
+library(sos)
+library(tseries)
+
+acf(msales.train)
+pacf(msales.train)
+acf(msales.dif.train)
+pacf(msales.dif.train)
+
+ndiffs(msales.train)
+#d=1
+#p=0
+#q=0
+#p,d,q
+
+#for ARIMA model using charts
+salesARIMA = arima(msales.train, order=c(0,1,0))
+salesARIMA
+tsdisplay(residuals(salesARIMA), lag.max=15, main='Model Residuals') 
+
+#Ljung box test
+#null residuals are independent
+#alternate residuals are not independent
+
+library(stats)
+Box.test(salesARIMA$residual, type ="Ljung-Box")
+
+msalesarima.f1 <- forecast::forecast(salesARIMA, h = 2)
+accuracy(msalesarima.f1, msales.test)
+autoplot(forecast::forecast(salesARIMA, h = 2))
+
+fit.arima <- auto.arima(msales.train, seasonal = FALSE)
+fit.arima
+
+msalesarima.f2 <- forecast::forecast(fit.arima, h = 2)
+accuracy(msalesarima.f2, msales.test)
+autoplot(forecast::forecast(fit.arima, h = 2))
+
+
+
+
+
+
+
+

@@ -1,0 +1,7 @@
+install.packages("forecast")
+library(forecast)
+plot(gas)
+str(gas)
+gas1 <- ts(gas, start=c(1970), end=c(1996))
+plot.ts(gas1)
+gasDec= stl(gas1[,2], s.window=1)
