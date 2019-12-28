@@ -1,10 +1,10 @@
 install.packages("forecast")
 library(forecast)
+write.csv(gas, file = "AusGas.csv")
 plot(gas)
 str(gas)
-gas1 <- ts(gas, start=c(1956),frequency =1)
+gas1 <- ts(gas, start=c(1956),frequency =12)
 plot.ts(gas1)
-
 
 #create train and test data
 gas.train <- window(gas1, end = c(1993))
@@ -14,6 +14,13 @@ gas.test<- window(gas1, start = c(1994))
 library(TTR)
 Gas.SMA <- SMA(gas1,n=13)
 ts.plot(Gas.SMA, gas1, gpars = list(col = c("red", "black")))
+
+#Decomposition
+gasComp = decompose(gas1)
+plot(gasComp)
+
+#Seasonally Adjusting
+
 
 #simple exponential smoothing #no trend no seasonality
 #constant forecast
@@ -43,3 +50,5 @@ holt.gas$model
 holt.gas$mean
 holt.gas$fitted
 accuracy(holt.gas, gas.test)
+
+#ARIMA Forecasting
