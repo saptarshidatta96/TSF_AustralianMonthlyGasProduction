@@ -5,7 +5,6 @@ str(gas)
 gas1 <- ts(gas, start=c(1956),frequency =1)
 plot.ts(gas1)
 
-
 #create train and test data
 gas.train <- window(gas1, end = c(1993))
 gas.test<- window(gas1, start = c(1994))
