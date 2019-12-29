@@ -8,7 +8,9 @@ plot.ts(gas1)
 
 #create train and test data
 gas.train <- window(gas1, end = c(1993))
+str(gas.train)
 gas.test<- window(gas1, start = c(1994))
+str(gas.test)
 
 #simple moving average
 library(TTR)
@@ -16,10 +18,11 @@ Gas.SMA <- SMA(gas1,n=13)
 ts.plot(Gas.SMA, gas1, gpars = list(col = c("red", "black")))
 
 #Decomposition
-gasComp = decompose(gas1)
+gasComp = decompose(gas1) #Additive
 plot(gasComp)
 
-#Seasonally Adjusting
+gasComp = decompose(gas1,"multiplicative") #multiplicative
+plot(gasComp)
 
 
 #simple exponential smoothing #no trend no seasonality
@@ -51,4 +54,12 @@ holt.gas$mean
 holt.gas$fitted
 accuracy(holt.gas, gas.test)
 
+#holt winter's model
+HoltWinters.gas = HoltWinters(gas.train)
+HW.forecast=forecast(HoltWinters.gas)
+HW.forecast
+HW.forecast$model
+HW.forecast$mean
+HW.forecast$fitted
+accuracy(HW.forecast, gas.test)
 #ARIMA Forecasting
