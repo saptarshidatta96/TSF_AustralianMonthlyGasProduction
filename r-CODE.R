@@ -74,5 +74,10 @@ autoplot(HW.forecast)
 
 #ARIMA Forecasting
 library(tseries)
+autoplot(gas1)
+acf(gas1)
 adf.test(gas1)
-acf(gas1,lag=50)
+autoplot(diff(diff(gas1, lag =12),1))
+adf.test(diff(gas1, lag =12))
+acf(diff(gas1, lag =12),1)
+acf(diff(diff(gas1, lag =12),1),1)
