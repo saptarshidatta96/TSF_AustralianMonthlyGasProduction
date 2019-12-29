@@ -1,15 +1,16 @@
 install.packages("forecast")
 library(forecast)
-write.csv(gas, file = "AusGas.csv")
+#write.csv(gas, file = "AusGas.csv")
 plot(gas)
 str(gas)
-gas1 <- ts(gas, start=c(1956),frequency =12)
+gas1 <- ts(gas, start=c(1956,1),frequency =12)
+str(gas1)
 plot.ts(gas1)
 
 #create train and test data
-gas.train <- window(gas1, end = c(1993))
+gas.train <- window(gas1, end = c(1994,12))
 str(gas.train)
-gas.test<- window(gas1, start = c(1994))
+gas.test<- window(gas1, start = c(1995,1))
 str(gas.test)
 
 #simple moving average
@@ -56,10 +57,11 @@ accuracy(holt.gas, gas.test)
 
 #holt winter's model
 HoltWinters.gas = HoltWinters(gas.train)
-HW.forecast=forecast(HoltWinters.gas)
+HW.forecast=forecast(HoltWinters.gas, h= 24)
 HW.forecast
 HW.forecast$model
 HW.forecast$mean
 HW.forecast$fitted
 accuracy(HW.forecast, gas.test)
+autoplot(HW.forecast)
 #ARIMA Forecasting
