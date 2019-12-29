@@ -72,12 +72,24 @@ HW.forecast$fitted
 accuracy(HW.forecast, gas.test)
 autoplot(HW.forecast)
 
-#ARIMA Forecasting
+#Checking for Stationary series
 library(tseries)
 autoplot(gas1)
-acf(gas1)
+acf(gas1, lag.max = 50)
 adf.test(gas1)
-autoplot(diff(log(gas1), lag =12))
-adf.test(diff(gas1, lag =12))
-acf(diff(log(gas1), lag =12),lag =1 )
-#ggAcf(diff(diff(gas1, lag =12),1),1)
+
+#Differencing the series
+diff.TS=diff(diff(gas1,lag =12),lag =1)
+autoplot(diff.TS)
+adf.test(diff.TS)
+acf(diff.TS, lag.max=50)
+acf(diff.TS, lag.max=50, plot = FALSE)
+pacf(diff.TS, lag.max=50)
+pacf(diff.TS, lag.max=50, plot = FALSE)
+
+#ARIMA Model
+gas.arima.fit <- arima(diff.TS, c(3, 0, 0))
+gas.arima.fit
+Box.test(gas.arima.fit$residuals, lag=30, type="Ljung-Box")
+autoplot(forecast(gas.arima.fit, h=3))
+
