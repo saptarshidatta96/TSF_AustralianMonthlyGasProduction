@@ -1,8 +1,9 @@
-install.packages("forecast")
+#install.packages("forecast")
 library(forecast)
 #write.csv(gas, file = "AusGas.csv")
 plot(gas)
 str(gas)
+frequency(gas)
 gas1 <- ts(gas, start=c(1956,1),frequency =12)
 str(gas1)
 plot.ts(gas1)
@@ -28,16 +29,19 @@ plot(gasComp)
 
 #simple exponential smoothing #no trend no seasonality
 #constant forecast
-ses.gas = ses(gas.train, alpha = 0.2, h=3)
+ses.gas = ses(gas.train, alpha = NULL,
+              h = 24,level = c(80, 95))
 autoplot(ses.gas)
 accuracy(ses.gas, gas.test)
 ses.gas$model
 ses.gas$fitted
+ses.forecast=forecast(ses.gas)
+ses.forecast
+
 
 #lag 1 difference #ses on diff sales data
 gas.dif.train <- diff(gas.train)
 gas.dif.test <- diff(gas.test)
-
 autoplot(gas.dif.train)
 ses.gas.dif <- ses(gas.dif.train, h = 3)
 ses.gas.dif$model
@@ -47,21 +51,28 @@ autoplot(ses.gas.dif)
 
 #holt's model with level and trend but no seasonality
 #double exponential smoothing
-holt.gas <- holt(gas.train, h = 3)
+holt.gas <- holt(gas.train, h=24,
+                 level = c(80, 95),alpha = NULL, beta= NULL)
+Holt.forecast=forecast(holt.gas)
+Holt.forecast
 autoplot(holt.gas)
-autoplot(forecast(holt.gas))
-holt.gas$model
+Holt.forecast$model
 holt.gas$mean
 holt.gas$fitted
 accuracy(holt.gas, gas.test)
 
 #holt winter's model
-HoltWinters.gas = HoltWinters(gas.train)
-HW.forecast=forecast(HoltWinters.gas, h= 24)
+HoltWinters.gas = HoltWinters(gas.train, alpha = NULL, beta = NULL, gamma = NULL,
+                              seasonal = c("additive", "multiplicative"))
+HW.forecast=forecast(HoltWinters.gas)
 HW.forecast
 HW.forecast$model
 HW.forecast$mean
 HW.forecast$fitted
 accuracy(HW.forecast, gas.test)
 autoplot(HW.forecast)
+
 #ARIMA Forecasting
+library(tseries)
+adf.test(gas1)
+acf(gas1,lag=50)
