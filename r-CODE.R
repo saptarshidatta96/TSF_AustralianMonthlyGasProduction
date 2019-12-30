@@ -25,7 +25,7 @@ ts.plot(Gas.SMA, gas1, gpars = list(col = c("red", "black")))
 gasComp = decompose(gas1) #Additive
 plot(gasComp)
 
-gasComp = decompose(gas1,"multiplicative") #multiplicative
+gasComp = decompose(log(gas1),"multiplicative") #multiplicative
 plot(gasComp)
 
 
@@ -81,7 +81,7 @@ acf(gas1, lag.max = 50)
 adf.test(gas1)
 
 #Differencing the series
-diff.TS=diff(diff(log(gas1),lag =12),1)
+diff.TS=diff(diff(gas1,lag =12),1)
 autoplot(diff.TS)
 adf.test(diff.TS)
 acf(diff.TS, lag.max=50)
@@ -91,9 +91,14 @@ pacf(diff.TS, lag.max=50, plot = FALSE)
 
 #ARIMA Model
 library(fpp2)
-gas.arima.fit <- Arima(diff.TS,order =c(2,1,5),seasonal=c(1,0,1))
+gas.arima.fit <- Arima(diff.TS,order =c(2,1,1))
 gas.arima.fit
 checkresiduals(gas.arima.fit)
 Box.test(gas.arima.fit$residuals, lag=30, type="Ljung-Box")
-autoplot(forecast(gas.arima.fit, h=36))
-
+autoplot(forecast(gas.arima.fit, h=12))
+gas.auto.arima.fit <- auto.arima(gas.train)
+ARIMA.forecast=forecast(gas.auto.arima.fit)
+accuracy(ARIMA.forecast,gas.test)
+gas.auto.arima.fit <- auto.arima()
+gas.auto.arima.fit <- auto.arima(gas1)
+autoplot(forecast(gas.auto.arima.fit, h=12))
