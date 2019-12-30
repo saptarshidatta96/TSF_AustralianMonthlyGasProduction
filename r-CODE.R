@@ -6,6 +6,8 @@ str(gas)
 frequency(gas)
 gas1 <- ts(gas, start=c(1956,1),frequency =12)
 str(gas1)
+monthplot(gas1)
+seasonplot(gas1)
 plot.ts(gas1)
 
 #create train and test data
@@ -79,7 +81,7 @@ acf(gas1, lag.max = 50)
 adf.test(gas1)
 
 #Differencing the series
-diff.TS=diff(diff(gas1,lag =12),lag =1)
+diff.TS=diff(diff(log(gas1),lag =12),1)
 autoplot(diff.TS)
 adf.test(diff.TS)
 acf(diff.TS, lag.max=50)
@@ -88,8 +90,10 @@ pacf(diff.TS, lag.max=50)
 pacf(diff.TS, lag.max=50, plot = FALSE)
 
 #ARIMA Model
-gas.arima.fit <- arima(diff.TS, c(3, 0, 0))
+library(fpp2)
+gas.arima.fit <- Arima(diff.TS,order =c(2,1,5),seasonal=c(1,0,1))
 gas.arima.fit
+checkresiduals(gas.arima.fit)
 Box.test(gas.arima.fit$residuals, lag=30, type="Ljung-Box")
-autoplot(forecast(gas.arima.fit, h=3))
+autoplot(forecast(gas.arima.fit, h=36))
 
